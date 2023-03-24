@@ -1,0 +1,40 @@
+// Dodatni tekst 
+function dodatno_polje() {
+ $args = array(
+ 'id' => 'custom_text_field_title',
+ 'label' => __( 'Unesite zeljeni tekst', 'robi' ),
+ 'class' => 'robi-custom-field',
+ 'desc_tip' => true,
+ 'description' => __( 'Unesite tekst koji zelite da se prikazuje', 'ctwc' ),
+ );
+ woocommerce_wp_text_input( $args );
+}
+add_action( 'woocommerce_product_options_general_product_data', 'dodatno_polje' );
+
+
+
+// Pohrana teksta 
+function spremanje_teksta_dodatnog_polja( $post_id ) {
+    $product = wc_get_product( $post_id );
+    $title = isset( $_POST['custom_text_field_title'] ) ? $_POST['custom_text_field_title'] : '';
+    $product->update_meta_data( 'custom_text_field_title', sanitize_text_field( $title ) );
+    $product->save();
+   }
+add_action( 'woocommerce_process_product_meta', 'spremanje_teksta_dodatnog_polja' );
+
+
+// Prikaz teksta na stranici proizvoda
+function tekst_prikaz() {
+    global $post;
+    // Provjera
+    $product = wc_get_product( $post->ID );
+    $title = $product->get_meta( 'custom_text_field_title' );
+    if( $title ) {
+    // Prikazi ako nije prazno
+    printf(
+    '<div class="custom-polje-za-ispit"><label for="custom-polje-za-naslov" style="margin-right: 30px;">%s </label></div><br /><hr />',
+    esc_html( $title )
+    );
+    }
+   }
+add_action( 'woocommerce_before_add_to_cart_button', 'tekst_prikaz' );
